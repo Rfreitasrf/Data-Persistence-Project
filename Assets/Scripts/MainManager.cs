@@ -14,6 +14,7 @@ public class MainManager : MonoBehaviour
     public GameObject NameField; //Text Box
     public GameObject GameOverText1;
     public GameObject GameOverText2;
+    public GameObject GameOverPainel;
 
     private bool m_Started = false;
     private bool m_GameOver = false;
@@ -43,12 +44,9 @@ public class MainManager : MonoBehaviour
             }
         }
 
-        //Listener calls the method after the user types the name when the record is broken
-        InputField.onEndEdit.AddListener(OnNameEntered);
-
         //Access the values ​​in the SaveLoadManager class
-        m_PointsRecord = SaveLoadManager.instance.CurrentRecordPoints;
         m_RecordHolder = SaveLoadManager.instance.RecordHolder;
+        m_PointsRecord = SaveLoadManager.instance.CurrentRecordPoints;
 
         //Ensures that the text will only appear if there is a Json file
         if (File.Exists(SaveLoadManager.instance.path))
@@ -62,6 +60,11 @@ public class MainManager : MonoBehaviour
 
         //Initializes the variable responsible for verify if the record were broken
         NewRecord = false;
+
+        GameOverPainel.SetActive(false);
+
+        //Listener calls the method after the user types the name when the record is broken
+        InputField.onEndEdit.AddListener(OnNameEntered);
     }
 
     private void Update()
@@ -82,6 +85,7 @@ public class MainManager : MonoBehaviour
         else if (m_GameOver && !NewRecord)
         {
             //warning about pressing space to restart
+            GameOverPainel.SetActive(true);
             GameOverText1.SetActive(true);
 
             //This option is only available if there the record weren't broken
@@ -106,7 +110,9 @@ public class MainManager : MonoBehaviour
         if (m_PointsRecord < m_Points)
         {
             //This informs that the record was broken.
+            GameOverPainel.SetActive(true);
             GameOverText2.SetActive(true);
+
 
             //Reveals text box for player to write name
             NameField.SetActive(true);
@@ -118,6 +124,7 @@ public class MainManager : MonoBehaviour
     }
 
     //Called by the Event listener when the player finishes typing the name
+    //Responsable for Save in disk and reload the scene
     private void OnNameEntered(string playerName)
     {
         if (!string.IsNullOrEmpty(playerName))
@@ -127,9 +134,13 @@ public class MainManager : MonoBehaviour
             //Call the method that restart the scene
             if (m_GameOver && NewRecord)
             {
+                //Update fields in SaveLoadManager Class
+                SaveLoadManager.instance.RecordHolder = playerName;
+                SaveLoadManager.instance.CurrentRecordPoints = m_Points;
+                
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
-                SaveLoadManager.instance.LoadRecord();
+                //SaveLoadManager.instance.LoadRecord();
             }
         }
         else

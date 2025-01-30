@@ -859,8 +859,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06af2dda93db8d548a32df1f1775f0c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentRecordPoints: 0
   RecordHolder: 
+  CurrentRecordPoints: 0
   RecordText: {fileID: 1571695667}
   path: 
 --- !u!1 &1153417814
@@ -996,7 +996,7 @@ GameObject:
   - component: {fileID: 1571695668}
   - component: {fileID: 1571695667}
   m_Layer: 5
-  m_Name: 'Record Text '
+  m_Name: Record Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,14 +1,14 @@
 using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 
 
 public class SaveLoadManager : MonoBehaviour
 {
     public static SaveLoadManager instance;
-    public int CurrentRecordPoints;
     public string RecordHolder;
+    public int CurrentRecordPoints;
     [SerializeField] private Text RecordText;
 
     public string path;
@@ -16,21 +16,49 @@ public class SaveLoadManager : MonoBehaviour
     
     private void Awake() //Responsible for "taking" the MainManager GameObj to the next scene
     {
+
         if (instance != null)
         {
-            Destroy(FindFirstObjectByType<SaveLoadManager>().gameObject);
+            //Destroy(FindAnyObjectByType<SaveLoadManager>().gameObject);
+            Destroy(gameObject);
+
             return;
         }
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+        path = Application.persistentDataPath + "/savefile.json";
+
+        LoadRecord();
+
+        //Adds an event to update the UI reference when the scene changes
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+    }
+
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+
+        //Updates the reference to Text whenever a new scene is loaded
+        if (GameObject.Find("Record Text"))
+        {
+            RecordText = GameObject.Find("Record Text").GetComponent<Text>();
+            RecordText.text = $"{RecordHolder.ToUpper()} has the current record whith {CurrentRecordPoints} points";
+        }
+
+    }
+
+    private void OnDestroy()
+    {
+        //Remove the event when destroying the object to avoid errors
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void Start()
     {
         path = Application.persistentDataPath + "/savefile.json";
-
-        LoadRecord();
 
         if (File.Exists(path))
         {
@@ -41,6 +69,7 @@ public class SaveLoadManager : MonoBehaviour
             RecordText.text = "";
         }       
     }
+
 
     [System.Serializable]
     class SaveData
